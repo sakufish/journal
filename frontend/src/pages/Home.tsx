@@ -21,7 +21,7 @@ const Login = () => {
   const handleSubmit = async () => {
     setErrorMessage(''); 
     try {
-      const response = await fetch('http://localhost:3000/api/users/register', {
+      const response = await fetch('https://diary-tvtf.onrender.com/api/users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

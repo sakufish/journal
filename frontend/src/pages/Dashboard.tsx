@@ -46,7 +46,7 @@ const Dashboard = () => {
 
   const fetchDiaryEntries = async (user: string, token: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/diary/entries/${user}`, {
+      const response = await fetch(`https://diary-tvtf.onrender.com/api/diary/entries/${user}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -111,7 +111,7 @@ const Dashboard = () => {
     if (!token) return;
 
     try {
-      const response = await fetch('http://localhost:3000/api/diary/add-entry', {
+      const response = await fetch('https://diary-tvtf.onrender.com/api/diary/add-entry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
