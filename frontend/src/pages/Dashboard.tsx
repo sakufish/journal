@@ -198,7 +198,7 @@ const Dashboard = () => {
                     onChange={(e) => setTags({...tags, exercise: e.target.value})}
                     className="text-xs text-gray-600 bg-transparent border-none focus:outline-none"
                   >
-                    <option value="low">light exercise</option>
+                    <option value="low">no exercise</option>
                     <option value="medium">moderate exercise</option>
                     <option value="high">intense exercise</option>
                   </select>
