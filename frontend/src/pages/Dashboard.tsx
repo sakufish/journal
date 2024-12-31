@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { 
   SmileIcon, MehIcon, FrownIcon, AngryIcon, LaughIcon,
-  UtensilsIcon, SaladIcon, CakeIcon, 
-  Dumbbell, Timer, Rocket,
+  UtensilsIcon, SaladIcon, CakeSlice, 
+  Dumbbell, Timer, Sofa,
   BriefcaseIcon, Brain, Coffee
 } from 'lucide-react';
 
@@ -65,16 +65,16 @@ const Dashboard = () => {
   const EatingIcon = ({ type, size = 16 }: { type: string, size?: number }) => {
     switch (type) {
       case 'healthy': return <SaladIcon size={size} className="text-gray-400" />;
-      case 'unhealthy': return <CakeIcon size={size} className="text-gray-400" />;
+      case 'unhealthy': return <CakeSlice size={size} className="text-gray-400" />;
       default: return <UtensilsIcon size={size} className="text-gray-400" />;
     }
   };
 
   const ExerciseIcon = ({ level, size = 16 }: { level: string, size?: number }) => {
     switch (level) {
-      case 'high': return <Rocket size={size} className="text-gray-400" />;
+      case 'high': return <Dumbbell size={size} className="text-gray-400" />;
       case 'medium': return <Timer size={size} className="text-gray-400" />;
-      default: return <Dumbbell size={size} className="text-gray-400" />;
+      default: return <Sofa size={size} className="text-gray-400" />;
     }
   };
 
