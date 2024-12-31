@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { 
   SmileIcon, MehIcon, FrownIcon, AngryIcon, LaughIcon,
-  UtensilsIcon, FootprintsIcon, UsersIcon, DumbbellIcon, 
-  BriefcaseIcon
+  UtensilsIcon, SaladIcon, CakeIcon, 
+  Dumbbell, Timer, Rocket,
+  BriefcaseIcon, Brain, Coffee
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -12,8 +13,6 @@ const Dashboard = () => {
   const [entries, setEntries] = useState<any[]>([]);
   const [tags, setTags] = useState({
     eat: 'moderate',
-    walk: false,
-    familyTime: false,
     exercise: 'low',
     work: 'neutral'
   });
@@ -30,6 +29,15 @@ const Dashboard = () => {
     }
   }, []);
 
+  const formatDate = (date: string) => {
+    const d = new Date(date);
+    return d.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      month: 'long', 
+      day: 'numeric' 
+    }).toLowerCase();
+  };
+
   const fetchDiaryEntries = async (user: string) => {
     try {
       const response = await fetch(`http://localhost:3000/api/diary/entries/${user}`);
@@ -44,13 +52,38 @@ const Dashboard = () => {
     }
   };
 
-  const MoodIcon = ({ mood, size = 16 }: { mood: string, size?: number }) => {
+  const EatingIcon = ({ type, size = 16 }: { type: string, size?: number }) => {
+    switch (type) {
+      case 'healthy': return <SaladIcon size={size} className="text-gray-400" />;
+      case 'unhealthy': return <CakeIcon size={size} className="text-gray-400" />;
+      default: return <UtensilsIcon size={size} className="text-gray-400" />;
+    }
+  };
+
+  const ExerciseIcon = ({ level, size = 16 }: { level: string, size?: number }) => {
+    switch (level) {
+      case 'high': return <Rocket size={size} className="text-gray-400" />;
+      case 'medium': return <Timer size={size} className="text-gray-400" />;
+      default: return <Dumbbell size={size} className="text-gray-400" />;
+    }
+  };
+
+  const WorkIcon = ({ status, size = 16 }: { status: string, size?: number }) => {
+    switch (status) {
+      case 'productive': return <Brain size={size} className="text-gray-400" />;
+      case 'unproductive': return <Coffee size={size} className="text-gray-400" />;
+      default: return <BriefcaseIcon size={size} className="text-gray-400" />;
+    }
+  };
+
+  const MoodIcon = ({ mood, size = 16, isSelected = false }: { mood: string, size?: number, isSelected?: boolean }) => {
+    const colorClass = isSelected ? "text-gray-600" : "text-gray-400";
     switch (mood) {
-      case 'happy': return <SmileIcon size={size} className="text-gray-400" />;
-      case 'neutral': return <MehIcon size={size} className="text-gray-400" />;
-      case 'sad': return <FrownIcon size={size} className="text-gray-400" />;
-      case 'extra_sad': return <AngryIcon size={size} className="text-gray-400" />;
-      case 'extra_happy': return <LaughIcon size={size} className="text-gray-400" />;
+      case 'happy': return <SmileIcon size={size} className={colorClass} />;
+      case 'neutral': return <MehIcon size={size} className={colorClass} />;
+      case 'sad': return <FrownIcon size={size} className={colorClass} />;
+      case 'extra_sad': return <AngryIcon size={size} className={colorClass} />;
+      case 'extra_happy': return <LaughIcon size={size} className={colorClass} />;
       default: return null;
     }
   };
@@ -81,8 +114,6 @@ const Dashboard = () => {
         setCurrentNote('');
         setTags({
           eat: 'moderate',
-          walk: false,
-          familyTime: false,
           exercise: 'low',
           work: 'neutral'
         });
@@ -94,20 +125,18 @@ const Dashboard = () => {
 
   return (
     <div className="fixed inset-0 w-full h-full bg-white">
-      <div className="flex justify-between items-center p-8 border-b border-gray-100">
-        <div className="flex items-center gap-4">
-          <p className="text-xs text-gray-400">you are {username}</p>
-          <h1 className="text-sm text-gray-600">journal</h1>
-        </div>
+      <div className="flex flex-col p-8 border-b border-gray-100">
+        <p className="text-xs text-gray-400">you are {username}</p>
+        <h1 className="text-sm text-gray-600 mt-2">journal</h1>
         <span
           onClick={handleLogOut}
-          className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer transition-colors"
+          className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer transition-colors absolute top-8 right-8"
         >
           log out
         </span>
       </div>
 
-      <div className="flex h-[calc(100vh-4rem)]">
+      <div className="flex h-[calc(100vh-6rem)]">
         <div className="w-1/2 p-8 border-r border-gray-100">
           <div className="space-y-8">
             <div className="flex gap-4">
@@ -117,12 +146,12 @@ const Dashboard = () => {
                   onClick={() => setCurrentMood(mood)}
                   className={`p-2 rounded-full hover:bg-gray-50 transition-colors ${currentMood === mood ? 'bg-gray-50' : ''}`}
                 >
-                  <MoodIcon mood={mood} size={20} />
+                  <MoodIcon mood={mood} size={20} isSelected={currentMood === mood} />
                 </button>
               ))}
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               <textarea
                 value={currentNote}
                 onChange={(e) => setCurrentNote(e.target.value)}
@@ -133,7 +162,7 @@ const Dashboard = () => {
 
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <UtensilsIcon size={16} className="text-gray-400" />
+                  <EatingIcon type={tags.eat} />
                   <select
                     value={tags.eat}
                     onChange={(e) => setTags({...tags, eat: e.target.value})}
@@ -146,33 +175,7 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <FootprintsIcon size={16} className="text-gray-400" />
-                  <label className="text-xs text-gray-600 flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={tags.walk}
-                      onChange={(e) => setTags({...tags, walk: e.target.checked})}
-                      className="form-checkbox h-3 w-3 text-gray-400"
-                    />
-                    went for a walk
-                  </label>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <UsersIcon size={16} className="text-gray-400" />
-                  <label className="text-xs text-gray-600 flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={tags.familyTime}
-                      onChange={(e) => setTags({...tags, familyTime: e.target.checked})}
-                      className="form-checkbox h-3 w-3 text-gray-400"
-                    />
-                    spent time with family
-                  </label>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <DumbbellIcon size={16} className="text-gray-400" />
+                  <ExerciseIcon level={tags.exercise} />
                   <select
                     value={tags.exercise}
                     onChange={(e) => setTags({...tags, exercise: e.target.value})}
@@ -185,7 +188,7 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <BriefcaseIcon size={16} className="text-gray-400" />
+                  <WorkIcon status={tags.work} />
                   <select
                     value={tags.work}
                     onChange={(e) => setTags({...tags, work: e.target.value})}
@@ -198,12 +201,14 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <button 
-                onClick={handleSubmit}
-                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                save
-              </button>
+              <div className="pt-4">
+                <span 
+                  onClick={handleSubmit}
+                  className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer transition-colors"
+                >
+                  save
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -214,26 +219,14 @@ const Dashboard = () => {
               <div className="flex gap-3 items-center">
                 <MoodIcon mood={entry.dailyMood} />
                 <p className="text-xs text-gray-400">
-                  {new Date(entry.createdAt).toLocaleDateString()}
+                  {formatDate(entry.createdAt)}
                 </p>
               </div>
               <p className="text-xs text-gray-600 ml-7">{entry.notes}</p>
               <div className="flex gap-2 ml-7">
-                {entry.tags.eat !== 'moderate' && (
-                  <UtensilsIcon size={12} className="text-gray-400" />
-                )}
-                {entry.tags.walk && (
-                  <FootprintsIcon size={12} className="text-gray-400" />
-                )}
-                {entry.tags.familyTime && (
-                  <UsersIcon size={12} className="text-gray-400" />
-                )}
-                {entry.tags.exercise !== 'low' && (
-                  <DumbbellIcon size={12} className="text-gray-400" />
-                )}
-                {entry.tags.work !== 'neutral' && (
-                  <BriefcaseIcon size={12} className="text-gray-400" />
-                )}
+                <EatingIcon type={entry.tags.eat} size={12} />
+                <ExerciseIcon level={entry.tags.exercise} size={12} />
+                <WorkIcon status={entry.tags.work} size={12} />
               </div>
             </div>
           )) : (
