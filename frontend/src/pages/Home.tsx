@@ -31,6 +31,7 @@ const Login = () => {
 
       if (response.ok) {
         document.cookie = `username=${username}; path=/; max-age=${7 * 24 * 60 * 60}`;
+        localStorage.setItem('authToken', data.token);
         setIsLoggedIn(true);
         window.location.href = '/home';
       } else {
@@ -43,6 +44,7 @@ const Login = () => {
 
   const handleLogout = () => {
     document.cookie = "username=; path=/; max-age=0";
+    localStorage.removeItem('authToken'); 
     setIsLoggedIn(false);
     setUsername('');
     setPassword('');

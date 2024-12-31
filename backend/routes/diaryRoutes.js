@@ -2,15 +2,14 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/userModel');  
 const Diary = require('../models/dailyLogModel');
+const protectRoute = require('../middleware/protectRoute'); 
 
-router.get('/entries/:username', async (req, res) => {
+router.get('/entries/:username', protectRoute, async (req, res) => {
     try {
         const user = await User.findOne({ username: req.params.username });
-        
-        if (!user) {
-            const newUser = new User({ username: req.params.username });
-            await newUser.save();
-            return res.status(200).json([]);
+
+        if (!user || user.username !== req.user.username) {
+            return res.status(403).json({ message: 'Not authorized to view this data' });
         }
 
         const entries = await Diary.find({
@@ -24,15 +23,14 @@ router.get('/entries/:username', async (req, res) => {
     }
 });
 
-router.post('/add-entry', async (req, res) => {
+router.post('/add-entry', protectRoute, async (req, res) => {
     const { username, dailyMood, notes, tags } = req.body;
 
     try {
         let user = await User.findOne({ username });
 
-        if (!user) {
-            user = new User({ username });
-            await user.save();
+        if (!user || user.username !== req.user.username) {
+            return res.status(403).json({ message: 'Not authorized to add entries for this user' });
         }
 
         const newDiaryEntry = new Diary({

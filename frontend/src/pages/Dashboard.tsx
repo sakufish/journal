@@ -18,6 +18,12 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
+    const token = localStorage.getItem('authToken'); 
+    if (!token) {
+      window.location.href = '/';
+      return;
+    }
+
     const storedUsername = document.cookie
       .split('; ')
       .find(row => row.startsWith('username='));
@@ -25,7 +31,7 @@ const Dashboard = () => {
     if (storedUsername) {
       const user = storedUsername.split('=')[1];
       setUsername(user);
-      fetchDiaryEntries(user);
+      fetchDiaryEntries(user, token); 
     }
   }, []);
 
@@ -38,9 +44,13 @@ const Dashboard = () => {
     }).toLowerCase();
   };
 
-  const fetchDiaryEntries = async (user: string) => {
+  const fetchDiaryEntries = async (user: string, token: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/diary/entries/${user}`);
+      const response = await fetch(`http://localhost:3000/api/diary/entries/${user}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setEntries(Array.isArray(data) ? data : []);
@@ -90,16 +100,23 @@ const Dashboard = () => {
 
   const handleLogOut = () => {
     document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-    window.location.href = '/';
+    localStorage.removeItem('authToken'); 
+    window.location.href = '/'; 
   };
 
   const handleSubmit = async () => {
     if (!currentMood || !currentNote.trim()) return;
-    
+
+    const token = localStorage.getItem('authToken'); 
+    if (!token) return;
+
     try {
       const response = await fetch('http://localhost:3000/api/diary/add-entry', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, 
+        },
         body: JSON.stringify({
           username,
           dailyMood: currentMood,
@@ -109,7 +126,7 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
-        fetchDiaryEntries(username);
+        fetchDiaryEntries(username, token);
         setCurrentMood(null);
         setCurrentNote('');
         setTags({

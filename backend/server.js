@@ -4,12 +4,14 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const diaryRoutes = require('./routes/diaryRoutes');
+const bodyParser = require('body-parser');
 
 require('dotenv').config();
 
 const PORT = 3000;
 app.use(express.json());
 app.use(cors());
+app.use(bodyParser.json());
 
 const connectDB = async () => {
   try {
