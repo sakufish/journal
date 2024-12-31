@@ -1,31 +1,54 @@
 const express = require('express');
-const Diary = require('../models/dailyLogModel.js');
-
 const router = express.Router();
+const User = require('../models/userModel');  
+const Diary = require('../models/dailyLogModel');
 
-router.post('/', async (req, res) => {
+router.get('/entries/:username', async (req, res) => {
     try {
-        const { notes, dailyMood, tags } = req.body;
+        const user = await User.findOne({ username: req.params.username });
+        
+        if (!user) {
+            const newUser = new User({ username: req.params.username });
+            await newUser.save();
+            return res.status(200).json([]);
+        }
 
-        const diaryEntry = new Diary({
-            notes,
-            dailyMood,
-            tags,
-        });
+        const entries = await Diary.find({
+            _id: { $in: user.diaryEntries }
+        }).sort({ createdAt: -1 });
 
-        await diaryEntry.save();
-        res.status(201).json({ message: 'Diary entry created', diaryEntry });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(200).json(entries);
+    } catch (error) {
+        console.error('Error fetching entries:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-router.get('/', async (req, res) => {
+router.post('/add-entry', async (req, res) => {
+    const { username, dailyMood, notes, tags } = req.body;
+
     try {
-        const diaryEntries = await Diary.find();
-        res.json(diaryEntries);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+        let user = await User.findOne({ username });
+
+        if (!user) {
+            user = new User({ username });
+            await user.save();
+        }
+
+        const newDiaryEntry = new Diary({
+            dailyMood,
+            notes,
+            tags: tags || {}
+        });
+
+        await newDiaryEntry.save();
+        user.diaryEntries.push(newDiaryEntry._id);
+        await user.save();
+
+        res.status(200).json(newDiaryEntry);
+    } catch (error) {
+        console.error('Error adding entry:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 

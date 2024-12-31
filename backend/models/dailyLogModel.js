@@ -7,7 +7,7 @@ const diarySchema = new mongoose.Schema({
     },
     dailyMood: {
         type: String,
-        enum: ['happy', 'sad', 'neutral', 'excited', 'anxious'], 
+        enum: ['happy', 'sad', 'neutral', 'extra_happy', 'extra_sad'], 
         required: true,
     },
     tags: {
