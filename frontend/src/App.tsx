@@ -4,6 +4,8 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard'; 
 import ReactGA from "react-ga4";
 
+const trackingId = "G-0NHX9CKWE0";
+ReactGA.initialize(trackingId);
 
 const App: React.FC = () => {
   useEffect(() => {
