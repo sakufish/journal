@@ -25,8 +25,9 @@ const diarySchema = new mongoose.Schema({
             default: false, 
         },
         exercise: {
-            type: Number, 
-            default: 0,
+            type: String,
+            enum: ['low', 'medium', 'high'],
+            default: 'low',
         },
         work: {
             type: String,
