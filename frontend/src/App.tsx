@@ -2,15 +2,14 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home'; 
 import Dashboard from './pages/Dashboard'; 
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga4';
 
 
 const App: React.FC = () => {
   useEffect(() => {
     ReactGA.initialize('G-0NHX9CKWE0');
-    ReactGA.pageview(window.location.pathname + window.location.search);
+    ReactGA.send({ hitType: "pageview", page: window.location.pathname });
   }, []);
-
   return (
     <Router>
       <Routes>
